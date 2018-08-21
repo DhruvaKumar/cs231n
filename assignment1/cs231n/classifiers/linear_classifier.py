@@ -37,8 +37,8 @@ class LinearClassifier(object):
     # Run stochastic gradient descent to optimize W
     loss_history = []
     for it in range(num_iters):
-      X_batch = None
-      y_batch = None
+
+      
 
       #########################################################################
       # TODO:                                                                 #
@@ -51,7 +51,12 @@ class LinearClassifier(object):
       # Hint: Use np.random.choice to generate indices. Sampling with         #
       # replacement is faster than sampling without replacement.              #
       #########################################################################
-      pass
+      
+      # sample batch_size samples from X_train
+      idx = np.random.choice(num_train, batch_size)
+      X_batch = X[idx, :]
+      y_batch = y[idx]
+
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -65,7 +70,9 @@ class LinearClassifier(object):
       # TODO:                                                                 #
       # Update the weights using the gradient and the learning rate.          #
       #########################################################################
-      pass
+
+      self.W += -learning_rate * grad
+
       #########################################################################
       #                       END OF YOUR CODE                                #
       #########################################################################
@@ -89,12 +96,15 @@ class LinearClassifier(object):
       array of length N, and each element is an integer giving the predicted
       class.
     """
-    y_pred = np.zeros(X.shape[0])
+    # y_pred = np.zeros(X.shape[0])
     ###########################################################################
     # TODO:                                                                   #
     # Implement this method. Store the predicted labels in y_pred.            #
     ###########################################################################
-    pass
+    
+    scores = X.dot(self.W) # shape (N,C)
+    y_pred = np.argmax(scores, axis=1)
+
     ###########################################################################
     #                           END OF YOUR CODE                              #
     ###########################################################################
@@ -122,7 +132,8 @@ class LinearSVM(LinearClassifier):
   """ A subclass that uses the Multiclass SVM loss function """
 
   def loss(self, X_batch, y_batch, reg):
-    return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
+    # return svm_loss_vectorized(self.W, X_batch, y_batch, reg)
+    return svm_loss_naive(self.W, X_batch, y_batch, reg)
 
 
 class Softmax(LinearClassifier):
