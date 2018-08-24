@@ -10,7 +10,7 @@ http://cs231n.github.io/setup-instructions/
 - Q1: k-Nearest Neighbor classifier
 - Q2: Training a Support Vector Machine
 - [Q3: Implement a Softmax classifier](./assignment1/svm.ipynb)
-- Q4: Two-Layer Neural Network
+- [Q4: Two-Layer Neural Network](./assignment1/softmax.ipynb)
 - Q5: Higher Level Representations: Image Features
 
 
