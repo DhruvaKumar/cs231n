@@ -1,3 +1,4 @@
+
 from __future__ import print_function
 
 import numpy as np
@@ -75,7 +76,10 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    pass
+
+    hidden_scores = np.maximum(0, np.dot(X, W1) + b1)    # N x H
+    scores = np.dot(hidden_scores, W2) + b2              # N x C
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -92,7 +96,15 @@ class TwoLayerNet(object):
     # in the variable loss, which should be a scalar. Use the Softmax           #
     # classifier loss.                                                          #
     #############################################################################
-    pass
+    
+    exp_scores = np.exp(scores) # N x C
+    probs = exp_scores / np.sum(exp_scores, axis=1, keepdims=True) # N x C
+    neglogprobs = -np.log(probs[range(N), y]) # N x 1
+    
+    data_loss = np.sum(neglogprobs) / N
+    reg_loss = reg * (np.sum(W1 * W1) + np.sum(W2 * W2))
+    loss = data_loss + reg_loss
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -104,7 +116,32 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    pass
+    
+    dscores = probs # N x C
+    dscores[range(N), y] -= 1
+    dscores /= N
+
+    # backprop gradient to W2 and b2
+    dW2 = np.dot(hidden_scores.T, dscores) # H x C (HxN * NxC)
+    db2 = np.sum(dscores, axis=0, keepdims=True) # 1 x C
+    # backprop into hidden layer
+    dhidden = np.dot(dscores, W2.T) # N x H (NxC * CxH)
+    # backprop ReLU activation: gradient for negative values die
+    dhidden[hidden_scores <=0] = 0
+    # backprop into W1 and b1
+    dW1 = np.dot(X.T, dhidden) # D x H (DxN * NxH)
+    db1 = np.sum(dhidden, axis=0, keepdims=True) # 1 x H
+
+    # add gradient due to reg
+    dW2 += 2 * reg * W2
+    dW1 += 2 * reg * W1
+
+    grads['W2'] = dW2
+    grads['b2'] = db2
+    grads['W1'] = dW1
+    grads['b1'] = db1
+
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
